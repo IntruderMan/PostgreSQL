@@ -1,0 +1,233 @@
+Task 3:: 
+Create table: ‘unique_emails’ consisting of columns (email, email_right, email_left, email_domian, fullname, firstname,
+last name, firstname_lc, lastname_lc, fullname_length.
+a). Create firstname, last name from column full name 
+b). and email_right, email_lef, email_domiam from column email.
+c). Create a new column name_to_long datatype boolean where length of fullname is greater than 10 marked as true else false.
+
+TASK NO 4::
+Create column with name ‘fname_start_with_a’’ → should contain all the full_name that start with letter ‘a’.
+a). Create two columns with created_at, updated_at.
+b). Created_at should have manually inserted values.
+c). Updated_at should have a current timestamp.
+d). FETCH all the records that are updated  in the last 24 hours or <> mins.
+e). GET count of all records, group by created_at.
+f). Create a column updated_email, where you need to check which email is started with letter ‘a’, ‘v’, ‘s’, ‘m’,
+    and than 
+g). Try to replace the domain name from .com to ‘.co.in’ , and it should have updated_email_domain as well.
+h). Try to add another column ‘DOB’, and try to get the records grouping by ‘dob’.’
+i). See whose dob is min, check max email length.
+	      
+
+TASK NO::5
+Create another table same as ‘unique_emails’ name it as unique_emails_staging  without specifying  the schema of the table.
+a). Try switch case statements.( try atleast 3-5 examples).
+b). Add one more column to unique_emails_staging , and use switch case
+c). To update the column by putting multiple cases like -
+    (1). If length of email_left is >3 and <=5 , then update it as ‘small’,
+    (2). If length of email_left is >5 and <=8 , then update it as ‘medium’,
+    (3). If length of email_left is >8 and <=12 , then update it as  ‘a too large’.
+    
+____________________________________________________________________________________________________________________________________________________________________________
+============================================================================================================================================================================
+
+--Create table: ‘unique_emails’ consisting of columns (email, email_right, email_left, email_domian, fullname, firstname,
+--last name, firstname_lc, lastname_lc, fullname_length.
+create table unique_emails(eid serial, email text, email_right text, email_left text, email_domain text, fullname text,first_name text,last_name text,firstname_lc serial, lastname_lc serial,fullname_lc serial);
+
+--Insert data in table 
+insert into unique_emails(eid,email,fullname) 
+values (1, 'firstone@gmail.com','First One'),
+(2,'secondtwo@hotmail.com','Second Two'),
+(3,'thirdthree@outlook.com','Third Three'),
+(4,'fourthfor@zecdata.com','Fourth Four'),
+(5,'Fifthfive@gmail.com','Fifth Five'),
+(6,'Sixthsix@google.com','Sixth Six');
+
+--Show data of table
+select * from unique_emails;
+
+--a). Create firstname, last name from column full name 
+update unique_emails
+set first_name = split_part(fullname, ' ', 1), 
+    last_name = split_part(fullname, ' ', 2);
+
+--b). and email_right, email_lef from column email.
+update unique_emails
+set email_right = split_part(email, '@', 2),
+    email_left = split_part(email, '@', 1);
+
+--b). email_domiam from column email
+update unique_emails
+set email_domain = split_part(email_right, '.', 1);
+
+-- inset the length of first name, last name and full name in perticular column.
+update unique_emails
+set firstname_lc = length(first_name),
+    lastname_lc = length(last_name),
+	fullname_lc = length(fullname);
+
+--c). Create a new column name_to_long datatype boolean.
+ALTER TABLE unique_emails
+ADD name_to_long boolean;
+
+--c). length of fullname is greater than 10 marked as true else false in column name_to_long.
+update unique_emails
+set name_to_long = fullname_lc > 10,
+
+-- The query for trial 
+select fullname_lc from unique_emails where length(fullname_lc > 10)
+
+UPDATE unique_emails 
+SET name_to_long = (CASE WHEN LENGTH(fullname) > 10 THEN TRUE ELSE FALSE END);
+
+--Create column with name ‘fname_start_with_a’ → should contain all the full_name that start with letter ‘a’.
+ALTER TABLE unique_emails
+ADD fname_start_with_a text;
+
+--
+UPDATE unique_emails 
+SET fname_start_with_a = (CASE WHEN fullname LIKE 'F%' THEN fullname ELSE Null END);
+
+--a). Create two columns with created_at (TIMESTAMP), updated_at (TIMESTAMP DEFAULT CURRENT_TIMESTAMP).
+ALTER TABLE unique_emails
+ADD created_at TIMESTAMP, 
+ADD updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+--c). Updated_at should have a current timestamp.
+--b). Created_at should have manually inserted values.
+update unique_emails
+set created_at = ('2022-09-19 06:01:09-10') where eid = 1;
+update unique_emails
+set created_at = ('2022-09-20 18:01:09-08') where eid = 2;
+update unique_emails
+set created_at = ('2022-09-21 06:19:09-10') where eid = 3;
+update unique_emails
+set created_at = ('2022-09-21 08:09:09-10') where eid = 4;
+update unique_emails
+set created_at = ('2022-09-21 10:25:09-10') where eid = 5;
+update unique_emails
+set created_at = ('2022-09-21 14:07:09-10') where eid = 6;
+
+--d). FETCH all the records that are updated  in the last 24 hours or <> mins.
+SELECT *
+FROM unique_emails AS "Users"
+WHERE "Users"."updated_at" BETWEEN NOW() - INTERVAL '24 HOURS' AND NOW()
+ORDER BY "Users"."updated_at" DESC
+
+--e). GET count of all records, group by created_at.
+SELECT COUNT(fullname), date(created_at)
+FROM unique_emails
+WHERE date(created_at) >= date(current_date - interval '1 week')
+GROUP BY date(created_at)
+
+--f). Create a column updated_email
+ALTER TABLE unique_emails
+ADD updated_email text; 
+
+--f). where you need to check which email is started with letter ‘a’, ‘v’, ‘s’, ‘m’,
+SELECT * FROM unique_emails
+WHERE email LIKE 'a%' or email LIKE 'v%'
+or email LIKE 's%' or email LIKE 'm%';
+
+--f). Real work of above task
+UPDATE unique_emails 
+SET updated_email = (CASE WHEN email LIKE 'a%' or email LIKE 'v%' or email LIKE 's%' 
+					 or email LIKE 'm%' THEN email ELSE Null END);
+
+--g). Try to replace the domain name from .com to ‘.co.in’,
+--and it should have updated_email_domain as well.
+UPDATE unique_emails 
+SET email = REPLACE (email,'.com','.com.in');
+
+--h). Try to add another column ‘DOB’.
+ALTER TABLE unique_emails
+add column DOB date;
+
+--insert into DOB column values manually
+update unique_emails
+set dob = ('1998-09-24') where eid = 1;
+update unique_emails
+set dob = ('1996-09-25') where eid = 2;
+update unique_emails
+set dob = ('1997-10-14') where eid = 3;
+update unique_emails
+set dob = ('1996-09-24') where eid = 4;
+update unique_emails
+set dob = ('1992-10-04') where eid = 5;
+update unique_emails
+set dob = ('1998-10-10') where eid = 6;
+
+--h). And try to get the records grouping by ‘dob’.
+SELECT COUNT(fullname), date(dob)
+FROM unique_emails
+GROUP BY date(dob)
+
+--i). See whose dob is min.
+SELECT MIN (dob)
+FROM unique_emails;
+
+--i). check max email length.
+SELECT max(length(email))
+FROM unique_emails;
+
+--Show the data of table
+SELECT * FROM unique_emails
+
+--Drop the column Unique_emails if you want it.
+alter table unique_emails
+drop column eid;
+
+--TASK NO::5
+--Create another table same as ‘unique_emails’ name it as unique_emails_staging  without specifying  the schema of the table.
+create table unique_emails_staging(email text);
+
+--Inserting the data into table
+insert into unique_emails_staging(email) 
+values ('firstone@gmail.com'),
+('secondtwo@hotmail.com'),
+('thirdthree@outlook.com'),
+('fourthfor@zecdata.com'),
+('Fifthfive@gmail.com'),
+('Sixthsix@google.com');
+
+--show the data of table
+SELECT * FROM unique_emails_staging
+
+--gives primary key to email column in unique_email table.
+ALTER TABLE unique_emails ADD PRIMARY KEY (email);
+
+----gives primary key to email column in unique_emails_staging table.
+ALTER TABLE unique_emails_staging ADD PRIMARY KEY (email);
+
+--join two table only for trial (use update command for real work) 
+SELECT * FROM unique_emails
+FULL JOIN unique_emails_staging
+ON unique_emails.email = unique_emails_staging.email;
+
+--a). Try switch case statements.( try atleast 3-5 examples).
+-- I skip this step (a) if you want to do it so go through with step(c)
+
+--b). Add one more column to unique_emails_staging
+ALTER TABLE unique_emails_staging 
+ADD column unique_emails_staging text;
+
+--Show the data of table.
+SELECT * FROM unique_emails_staging 
+
+--c). To update the column by putting multiple cases like -
+--    (1). If length of email_left is >3 and <=5 , then update it as ‘small’,
+--    (2). If length of email_left is >5 and <=8 , then update it as ‘medium’,
+--    (3). If length of email_left is >8 and <=12 , then update it as  ‘a too large’.
+SELECT email_left,
+length(email_left),
+CASE
+WHEN length(email_left)> 3
+AND length(email_left) <= 5 THEN 'small'
+WHEN length(email_left)> 5
+AND length(email_left) <= 8 THEN 'medium'
+WHEN length(email_left)> 8
+AND length(email_left) <= 12 THEN 'a too large'
+END unique_emails_staging 
+FROM unique_emails
+ORDER BY email_left;
