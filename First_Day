@@ -1,0 +1,91 @@
+Task 1:: Create one table: 
+Fields: lid, fullname, contact_no, education,  exp, designation, job_st_dt
+
+a) Find max exp of lid.
+b) Get record between 2020 & 2021
+c) Find lid, fullname,  whose name ends and  starts with ‘a’
+d) Find min date from all records.
+
+
+Task 2:: Add two more fields and Create one more table:- linkedin_member_details
+Fields: first_name, last_name and fill both the fields using the full_name column only.
+Hint: use split_part function
+	
+Create another table:- linkedin_member_details 
+consisting of lid(same lid as in table: Linkedin_data, DOB, Email , Bio,Websites_url, company_name, sector 
+and current_status(boolean field), last_organization
+
+Get all the data consisting of both tables i,e linkedin_data and linkedin_member_details.
+
+Note*: Need to add more fields as per your requirement in table ‘linkedin_member_details’.
+________________________________________________________________________________________________________________________________________________________________
+================================================================================================================================================================
+
+--Create one table: Fields there columns name are:- lid, fullname, contact_no, education,  exp, designation, job_st_dt
+create table fields(lid text, fullname text, contact_no serial, education text, exp serial, designation text, job_st_dt);
+
+--insert values(data) in table
+insert into fields values (1,'Ankit',9691505162,'b.tech',4,'python developer','2022-09-15'),
+(2,'Kapil',7000040311,'m.tech',7,'software engineer','2022-01-30'),
+(3,'Abhijeet',8976545467,'BCA',5,'web developer','2022-03-25'),
+(4,'Kiran',7648987690,'B.com',6,'data scientist','2020-04-22'),
+(5,'Neeraj',7564784793,'BSc',3,'engineer','2022-08-30'),
+(6,'Praveen',789876789,'BCA',2,'Django','2021-09-05'),
+(7,'Jalal',7489382167,'BA',1,'Manager','2020-10-28'),
+(8,'ankita',9836478293,'B.tech',3,'data engineer','2020-01-30'),
+(9,'Anita',6269349093,'BSC',2,'Data Scientist','2020-03-30');
+
+--show tada of table
+select * from fields;
+
+--a) Find max exp of lid.
+SELECT * FROM "fields" WHERE "exp"= (SELECT MAX("exp") FROM "fields");
+
+--b) Get record between 2020 & 2021
+select "job_st_dt"  from "fields" 
+where "job_st_dt" >= '2020-01-01' and "job_st_dt" <= '2021-12-31';
+
+--c) Find lid, fullname,  whose name ends and  starts with ‘a’
+SELECT * FROM fields
+WHERE full_name LIKE 'A%' and full_name LIKE '%a'
+or full_name LIKE 'a%' and full_name LIKE 'a%';
+
+--d) Find min date from all records.
+SELECT * FROM "fields" 
+WHERE "job_st_dt"= (SELECT MIN("job_st_dt") FROM "fields");
+
+--show tada of table
+select * from fields
+
+--Add two more fields and Create one more table:- linkedin_member_details
+--Fields: first_name, last_name and fill both the fields using the full_name column only.
+--Hint: use split_part function
+SELECT split_part(full_name, ' ', 1) AS first_name,
+       split_part(full_name, ' ', 2) AS last_name
+FROM fields;
+
+--Create another table:- linkedin_member_details 
+--consisting of lid(same lid as in table: Linkedin_data, DOB, Email , Bio,Websites_url, company_name, sector 
+--and current_status(boolean field), last_organization
+create table linkedin_member_details(lid int primary key, linkedin_data text, DOB date, Email text, Bio text, Website_url text,company_name text,sector text, current_statu boolean,last_organization text);
+
+--insert values(data) in table
+insert into linkedin_member_details values(1,'linkedin.ankit','1998-08-01','ankitji@gmail.com','employee','abc.com','zecdata','IT','true','DDU-GKY'),
+(2,'linkedin.kapil','1998-08-30','kapilsea@gmail.com','employee','kpsingh.com','Infosys','IT','true','DDU-GKY'),
+(3,'linkedin.one','1997-08-31','one@gmail.com','employee','zero.com','Dell','ITs','true','DDU-GKY'),
+(4,'linkedin.two','1999-07-20','two@gmail.com','student','one.com','HP','HR','false','DDU-GKY'),
+(5,'linkedin.three','1996-06-20','three@gmail.com','employee','two.com','TCS','Management','true','DDU-GKY'),
+(6,'linkedin.four','1995-05-10','four@gmail.com','student','three.com','wipro','IT','false','DDU-GKY'),
+(7,'linkedin.five','1996-04-03','five@gmail.com','employee','four.com','dell','IT','true','DDU-GKY'),
+(8,'linkedin.six','1997-07-01','six@gmail.com','student','five.com','medplus','ITs','false','DDU-GKY'),
+(9,'linkedin.seven','1998-08-02','seven@gmail.com','student','six.com','xyz','Mangement','false','DDU-GKY');
+
+--show tada of both table
+select * from linkedin_member_details;
+select * from fields;
+
+--Get all the data consisting of both tables i,e linkedin_data and linkedin_member_details.
+--Note*: Need to add more fields as per your requirement in table ‘linkedin_member_details’.
+SELECT * FROM fields
+FULL JOIN linkedin_member_details
+ON fields.lid = linkedin_member_details.lid;
