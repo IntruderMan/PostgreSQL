@@ -1,0 +1,153 @@
+TASK NO: 6 
+Create student table. Take columns fname, lname, education, education start date , education end date
+
+a). Take education column value like [{degree: 12th, start_date : 2012, end_date: 2013},{degree:Bcom, start_date:2013, end_date: 2016}]
+b). Update new column letest_end_date 
+c). (Letest_end_date = 2016)
+
+Task No: 7
+Create employee table. Take columns emp_fname, emp_lname, emp_exp, experience start date , experiance end date
+
+a). Take emp_exp column value like [{position: manager,, start_date : 2012, end_date: 2013}]
+b). Extract start_date and end date  from dictionary values and update this in column 
+c). experience start date , experience end date 
+d). Take one another column exp_years and update it with difference of experience end- start date (ex . exp_years = experience start date- experience end date )
+
+TASK NO : 8 
+Create table for linkedin users 
+Take columns fname, name, education , experience, education_end_date, experiance_start_date, experiance_end_date, currently_working with datatype boolean, all_education with datatype varchar. 
+
+a). (Currently_working = TRUE when experiance_start_date is present and experiance_end_date is null or not present otherwise consider false.)
+b). (Take columns fname, lname, education, education start date , education end date those all
+    Take by education column value like [{degree: 12th, start_date : 2012, end_date: 2013},{degree:Bcom, start_date:2013, end_date: 2016}])
+c). (Take one another column exp_years and update it with difference of experience end- start date (ex . exp_years = experience start date- experience end date ))
+d). All_education = merge all education degrees
+
+____________________________________________________________________________________________________________________________________________________________________________________________________
+====================================================================================================================================================================================================
+
+-- Task No: 6
+--Create student table. (Take columns fname, lname, education, education start date , education end date)
+create table student(fname text,lname text,education json,start_date text, end_date text);
+drop table student;
+select * from student;
+--insert data in table (  Take education column value like [{degree: 12th, start_date : 2012, end_date: 2013},{degree:Bcom, start_date:2013, end_date: 2016}])
+
+insert into student(fname,lname,education) values('Ankit','Puri','[{"degree": "12th", "start_date": 2012, "end_date": 2013},
+{"degree": "B.com", "start_date": 2013, "end_date": 2016}]'),
+('Kapil','Kushwah','[{"degree": "12th", "start_date": 2016, "end_date": 2017},
+{"degree": "B.Tech", "start_date": 2017, "end_date": 2021}]'),
+('Kiran','Dhurve','[{"degree": "12th", "start_date": 2014, "end_date": 2015},
+{"degree": "B.Sc", "start_date": 2015, "end_date": 2017}]'),
+('Neeraj','Morya','[{"degree": "12th", "start_date": 2015, "end_date": 2016},
+{"degree": "BA", "start_date": 2016, "end_date": 2018}]'),
+('Abhijeet','Chouhan','[{"degree": "12th", "start_date": 2019, "end_date": 2020},
+{"degree": "BCA", "start_date": 2020, "end_date": 2022}]');
+
+select * from student
+
+--Upadate_end_date = 2016)
+update student
+set start_date = (education::jsonb)->0->>'start_date',
+    end_date = (education::jsonb)->0->>'end_date';  
+                         
+--Update new column letest_end_date 
+alter table student
+add letest_end_date text;
+
+--(Letest_end_date = 2016)
+update student
+set letest_end_date = (education::jsonb)->1->>'end_date';
+
+--Show the table
+select * from student;
+
+-- Task No: 7
+--Create employee table. (Take columns emp_fname, emp_lname, emp_exp, experience start date , experiance end date Take emp_exp column )
+create table employee(emp_fname text,emp_lname text,emp_exp json, ex_start_date text, ex_end_date text);
+
+--Insert values (value like [{position: manager,, start_date : 2012, end_date: 2013}])
+insert into employee(emp_fname,emp_lname,emp_exp) 
+             values('Ankit','Puri','[{"position": "manager","start_date" : 2010, "end_date": 2020}]'),
+                   ('Kapil','Kushwah','[{"position": "HR","start_date"  : 2008, "end_date": 2021}]'),
+				   ('Kiran','Dhurve','[{"position": "Engineer","start_date"  : 2011, "end_date": 2019}]'),
+			       ('Neeraj','Morya','[{"position": "Head","start_date"  : 2009, "end_date": 2021}]'),
+				   ('Abhijeet','Chouhan','[{"position": "Admin","start_date"  : 2011, "end_date": 2013}]');
+
+--Extract start_date and end date  from dictionary values and update this in column 
+--experience start date , experience end date
+update employee
+set ex_start_date = (emp_exp::jsonb)->0->>'start_date',
+    ex_end_date = (emp_exp::jsonb)->0->>'end_date';  
+
+-- Change the column string to integer
+ALTER TABLE employee ALTER COLUMN ex_end_date TYPE integer USING (ex_end_date::integer),
+                     ALTER COLUMN ex_start_date TYPE integer USING (ex_start_date::integer);
+
+-- Take one another column exp_years
+alter table employee
+set exp_years serial;
+
+--update it with difference of experience end- start date (ex . exp_years = experience start date- experience end date )
+update employee
+set exp_years = ex_end_date - ex_start_date;
+	
+--show table
+select * from employee;
+
+
+
+--Task No:8
+--Create table for linkedin users Take columns fname, name, education , experience, education_end_date, experiance_start_date, experiance_end_date, currently_working with datatype boolean, all_education with datatype varchar. 
+Create table for linkedin users 
+-- Take columns fname, name, education , experience, education_end_date, experiance_start_date, experiance_end_date, currently_working with datatype boolean, all_education with datatype varchar. 
+create table linkedin_users(fname text,lname text,education json,experiece serial,edu_end_date text, exp_start_date text,exp_end_date text,currently_working boolean,all_education text);
+
+-- Insert data in the table
+(Take columns fname, lname, education, education start date , education end date
+--   Take education column value like [{degree: 12th, start_date : 2012, end_date: 2013},{degree:Bcom, start_date:2013, end_date: 2016}])
+insert into linkedin_users(fname,lname,education,exp_start_date,exp_end_date)
+values('Ankit','Puri','[{"degree": "12th", "start_date" : 2012, "end_date": 2013},
+	   {"degree":"Bcom", "start_date":2013, "end_date": 2016}]','2017',null),
+	  ('Kapil','Kushwah','[{"degree": "12th", "start_date" : 2016, "end_date": 2017},
+	   {"degree":"B.Tech", "start_date":2017, "end_date": 2021}]','2021','2022'),
+	  ('Neeraj','Morya','[{"degree": "12th", "start_date" : 2011, "end_date": 2012},
+	   {"degree":"BCA", "start_date":2012, "end_date": 2015}]','2016','2019'),
+	  ('Praveen','Kushwah','[{"degree": "12th", "start_date" : 2010, "end_date": 2011},
+	   {"degree":"BSc", "start_date":2012, "end_date": 2015}]','2017',null),
+	   ('Kiran','Dhurve','[{"degree": "12th", "start_date" : 2016, "end_date": 2017},
+	   {"degree":"BE", "start_date":2017, "end_date": 2021}]','2021',null);
+
+-- (Currently_working = TRUE when experiance_start_date is present and experiance_end_date is null or not present otherwise consider false.)
+UPDATE linkedin_users 
+SET currently_working = (CASE WHEN LENGTH (exp_end_date) IS NOT NULL THEN False ELSE True END);
+
+-- fill the end_date column by list of string
+update linkedin_users
+set edu_end_date = (education::jsonb)->1->>'end_date';
+
+-- Covert column string into integer
+ALTER TABLE linkedin_users ALTER COLUMN exp_end_date TYPE integer USING (exp_end_date::integer),
+                           ALTER COLUMN exp_start_date TYPE integer USING (exp_start_date::integer);
+
+-- Take one another column exp_years 
+-- Alter table linkedin_users
+-- Add column exp_years int;
+
+-- Upadate exp_end_date with current date of year
+UPDATE linkedin_users
+SET exp_end_date = 2022
+WHERE exp_end_date IS NULL;
+
+ 
+-- update it with difference of experience end- start date (ex . exp_years = experience start date- experience end date )) 
+update linkedin_users
+set experiece = exp_end_date - exp_start_date;
+
+--  show table
+select * from linkedin_users
+
+
+--  All_education = merge all education degrees
+update linkedin_users
+set all_education = concat((education::jsonb)->0->>'degree',(education::jsonb)->1->>'degree');
